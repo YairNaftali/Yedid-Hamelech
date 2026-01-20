@@ -35,7 +35,7 @@ const Home: React.FC = () => {
           className="absolute inset-0 w-full h-full object-contain brightness-[0.35]" 
         />
         <div className="relative z-10 text-center text-white px-4 max-w-5xl">
-          <span className="block text-[#C9963F] text-xs md:text-sm uppercase tracking-[0.3em] md:tracking-[0.4em] mb-4 md:mb-6 font-semibold">Jerusalem, Israel</span>
+          <span className="block text-[#C9963F] text-xs md:text-sm uppercase tracking-[0.3em] md:tracking-[0.4em] mb-4 md:mb-6 font-semibold">Yerushalaim, Israel</span>
           <h1 className="text-3xl md:text-8xl mb-6 md:mb-8 leading-tight font-semibold serif">Premier Torah Education</h1>
           <p className="text-base md:text-2xl font-light tracking-wide italic text-gray-200 max-w-3xl mx-auto leading-relaxed">
             "A sanctuary for serious bochrim to elevate their learning, refine their character, and build their future in the heart of Yerushalayim Ir HaKodesh."
@@ -57,7 +57,7 @@ const Home: React.FC = () => {
           <h2 className="text-3xl md:text-5xl mb-8 md:mb-10 text-[#2C3E50] serif italic font-semibold">Yeshivas Yedid Hamelech</h2>
           <div className="w-24 h-[2px] bg-[#C9963F] mx-auto mb-8 md:mb-12"></div>
           <p className="text-lg md:text-xl leading-relaxed text-gray-700 mb-8 font-light italic">
-            Yeshivas Yedid Hamelech is a third year Yeshiva for serious bochrim to take their limud haiyuin, hashkofo, and the opportunity, for the higher level bochrim, to learn shmaysa aliba dehilchso in a premier kollel in Yerushalayim Ir Hakodesh.
+            Yeshivas Yedid Hamelech is a third year and above Yeshiva for serious bochrim to take their limud haiyuin, hashkofo, and the opportunity, for the higher level bochrim, to learn shmaysa aliba dehilchso in a premier kollel in Yerushalayim Ir Hakodesh.
           </p>
           <p className="text-lg leading-relaxed text-gray-600 mb-4">
             Our Yeshiva is filled with avreichim, poskim, and talmidei chachomim giving the bochrim an envelopment of seriousness, care, and kedusha. Under the direction of Rosh HaYeshiva VeRosh HaKollel Rov Yonatan Dorfman shlita, the bochrim have access to the highest forms of iyuin, pilpul, and shimush in psak.
@@ -402,7 +402,7 @@ const Home: React.FC = () => {
       <section className="py-32 bg-[#C9963F] text-[#2C3E50] text-center">
         <div className="max-w-3xl mx-auto px-4">
            <h2 className="text-3xl md:text-5xl serif mb-6 md:mb-8 italic font-bold">Begin Your Journey</h2>
-           <p className="text-base md:text-xl mb-8 md:mb-12 opacity-80 leading-relaxed">Join a community of serious bochrim dedicated to reaching their full potential in Jerusalem Ir HaKodesh.</p>
+           <p className="text-base md:text-xl mb-8 md:mb-12 opacity-80 leading-relaxed">Join a community of serious bochrim dedicated to reaching their full potential in Yerushalaim Ir HaKodesh.</p>
            <a href="#/apply" className="bg-[#7D1D3F] text-white px-12 py-5 rounded shadow-2xl text-sm font-bold uppercase tracking-[0.3em] hover:bg-white hover:text-[#7D1D3F] transition-all">Start Your Application</a>
         </div>
       </section>

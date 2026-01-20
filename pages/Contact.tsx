@@ -29,7 +29,7 @@ const Contact: React.FC = () => {
                   </div>
                   <div>
                     <h4 className="font-bold text-lg mb-1 text-[#0a192f] tracking-wide uppercase text-xs">Location</h4>
-                    <p className="text-gray-600 leading-relaxed italic">Emek Refaim Neighborhood<br />Jerusalem, Israel</p>
+                    <p className="text-gray-600 leading-relaxed italic">Emek Refaim Neighborhood<br />Yerushalaim, Israel</p>
                   </div>
                 </div>
 

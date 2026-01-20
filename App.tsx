@@ -44,7 +44,7 @@ const Navbar = () => {
             </div>
             <div className="hidden sm:block">
               <span className={`block font-semibold tracking-wide serif leading-tight transition-all duration-300 ${scrolled ? 'text-lg text-[#2C3E50]' : 'text-xl text-[#2C3E50]'}`}>Yeshivas Yedid Hamelech</span>
-              <span className="block text-[9px] uppercase tracking-[0.25em] text-[#C9963F] font-medium">Jerusalem, Israel</span>
+              <span className="block text-[9px] uppercase tracking-[0.25em] text-[#C9963F] font-medium">Yerushalaim, Israel</span>
             </div>
           </Link>
 
@@ -126,11 +126,11 @@ const Footer = () => (
             </div>
             <div>
               <h3 className="serif text-xl font-semibold tracking-wide">Yeshivas Yedid Hamelech</h3>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-[#1a5f7a]">Jerusalem, Israel</p>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[#1a5f7a]">Yerushalaim, Israel</p>
             </div>
           </div>
           <p className="text-gray-400 text-sm leading-relaxed max-w-md">
-            Providing a premier Torah environment for serious third-year bochrim in the heart of Jerusalem's Emek Refaim. Focusing on depth of learning, character refinement, and spiritual growth.
+            Providing a premier Torah environment for serious third-year and above bochrim in the heart of Yerushalaim's Emek Refaim. Focusing on depth of learning, character refinement, and spiritual growth.
           </p>
         </div>
         
@@ -148,7 +148,7 @@ const Footer = () => (
           <h4 className="text-[#1a5f7a] text-xs font-semibold uppercase tracking-[0.2em] mb-6">Connect</h4>
           <ul className="space-y-4 text-sm text-gray-400">
             <li className="flex items-center gap-2">
-              <span className="w-5 text-center">📍</span> Emek Refaim, Jerusalem
+              <span className="w-5 text-center">📍</span> Emek Refaim, Yerushalaim
             </li>
             <li className="flex items-center gap-2">
               <span className="w-5 text-center">📧</span> yedidhamelech@gmail.com
