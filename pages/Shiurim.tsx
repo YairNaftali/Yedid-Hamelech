@@ -153,7 +153,7 @@ const Shiurim: React.FC = () => {
   return (
     <div className="py-16 bg-[#F8F5F0]">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between items-center mb-16">
+        <div className="flex justify-between items-end mb-16">
           <h1 className="text-5xl text-[#2C3E50]">Shiurim</h1>
           {isAdmin && (
             <div className="flex gap-2">
