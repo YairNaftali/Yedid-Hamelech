@@ -7,6 +7,7 @@ interface Shiur {
   speaker: string;
   duration: string;
   category: string;
+  folder?: string;
 }
 
 const Shiurim: React.FC = () => {
@@ -15,10 +16,14 @@ const Shiurim: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [editingShiur, setEditingShiur] = useState<Shiur | null>(null);
+  const [selectedFolder, setSelectedFolder] = useState<string>('All');
+  const [showFolderManager, setShowFolderManager] = useState(false);
+  const [newFolderName, setNewFolderName] = useState('');
   const [uploadData, setUploadData] = useState({
     title: '',
     speaker: '',
     category: '',
+    folder: '',
     file: null as File | null
   });
 
@@ -26,19 +31,24 @@ const Shiurim: React.FC = () => {
   const ADMIN_PASSWORD = 'Admin2025';
 
   const defaultShiurim: Shiur[] = [
-    { id: '1', title: "Meseches Gittin: Iyun on 2a", speaker: "Rov Yonatan Dorfman", duration: "45:00", category: "Iyun" },
-    { id: '2', title: "Hashkafa: Building a Jewish Home", speaker: "Rov Binyamin Dennis", duration: "32:15", category: "Hashkafa" },
-    { id: '3', title: "Halacha: Hilchos Shabbos Overview", speaker: "Rov Yonatan Dorfman", duration: "58:40", category: "Halacha" },
+    { id: '1', title: "Meseches Gittin: Iyun on 2a", speaker: "Rov Yonatan Dorfman", duration: "45:00", category: "Iyun", folder: "General" },
+    { id: '2', title: "Hashkafa: Building a Jewish Home", speaker: "Rov Binyamin Dennis", duration: "32:15", category: "Hashkafa", folder: "General" },
+    { id: '3', title: "Halacha: Hilchos Shabbos Overview", speaker: "Rov Yonatan Dorfman", duration: "58:40", category: "Halacha", folder: "General" },
   ];
 
   const [latestShiurim, setLatestShiurim] = useState<Shiur[]>([]);
+  const [folders, setFolders] = useState<string[]>(['General']);
 
   useEffect(() => {
     const stored = localStorage.getItem('yeshiva-shiurim');
+    const storedFolders = localStorage.getItem('yeshiva-folders');
     if (stored) {
       setLatestShiurim(JSON.parse(stored));
     } else {
       setLatestShiurim(defaultShiurim);
+    }
+    if (storedFolders) {
+      setFolders(JSON.parse(storedFolders));
     }
   }, []);
 
@@ -46,6 +56,42 @@ const Shiurim: React.FC = () => {
     setLatestShiurim(shiurim);
     localStorage.setItem('yeshiva-shiurim', JSON.stringify(shiurim));
   };
+
+  const saveFolders = (newFolders: string[]) => {
+    setFolders(newFolders);
+    localStorage.setItem('yeshiva-folders', JSON.stringify(newFolders));
+  };
+
+  const addFolder = () => {
+    if (newFolderName.trim() && !folders.includes(newFolderName.trim())) {
+      const updated = [...folders, newFolderName.trim()];
+      saveFolders(updated);
+      setNewFolderName('');
+    }
+  };
+
+  const deleteFolder = (folderName: string) => {
+    if (folderName === 'General') {
+      alert('Cannot delete the General folder');
+      return;
+    }
+    if (confirm(`Delete folder "${folderName}"? Shiurim in this folder will be moved to General.`)) {
+      const updated = folders.filter(f => f !== folderName);
+      saveFolders(updated);
+      // Move shiurim from deleted folder to General
+      const updatedShiurim = latestShiurim.map(s => 
+        s.folder === folderName ? { ...s, folder: 'General' } : s
+      );
+      saveShiurim(updatedShiurim);
+      if (selectedFolder === folderName) {
+        setSelectedFolder('All');
+      }
+    }
+  };
+
+  const filteredShiurim = selectedFolder === 'All' 
+    ? latestShiurim 
+    : latestShiurim.filter(s => s.folder === selectedFolder);
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,7 +147,7 @@ const Shiurim: React.FC = () => {
     setIsAuthenticated(false);
     setIsAdmin(false);
     setPassword('');
-    setUploadData({ title: '', speaker: '', category: '', file: null });
+    setUploadData({ title: '', speaker: '', category: '', folder: '', file: null });
   };
 
   return (
@@ -110,16 +156,51 @@ const Shiurim: React.FC = () => {
         <div className="flex justify-between items-center mb-16">
           <h1 className="text-5xl text-[#2C3E50]">Shiurim</h1>
           {isAdmin && (
-            <button
-              onClick={() => {
-                setIsAdmin(false);
-                setIsAuthenticated(false);
-              }}
-              className="bg-gray-500 text-white px-6 py-2 rounded-sm text-sm font-semibold hover:bg-gray-600 transition-all uppercase tracking-wider"
-            >
-              Exit Admin Mode
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowFolderManager(true)}
+                className="bg-[#C9963F] text-white px-6 py-2 rounded-sm text-sm font-semibold hover:bg-[#b8853a] transition-all uppercase tracking-wider"
+              >
+                Manage Folders
+              </button>
+              <button
+                onClick={() => {
+                  setIsAdmin(false);
+                  setIsAuthenticated(false);
+                }}
+                className="bg-gray-500 text-white px-6 py-2 rounded-sm text-sm font-semibold hover:bg-gray-600 transition-all uppercase tracking-wider"
+              >
+                Exit Admin Mode
+              </button>
+            </div>
           )}
+        </div>
+
+        {/* Folder Navigation */}
+        <div className="mb-8 flex flex-wrap gap-2">
+          <button
+            onClick={() => setSelectedFolder('All')}
+            className={`px-4 py-2 rounded-sm font-semibold transition-all ${
+              selectedFolder === 'All'
+                ? 'bg-[#7D1D3F] text-white'
+                : 'bg-white text-[#7D1D3F] hover:bg-gray-50'
+            }`}
+          >
+            📁 All Shiurim ({latestShiurim.length})
+          </button>
+          {folders.map(folder => (
+            <button
+              key={folder}
+              onClick={() => setSelectedFolder(folder)}
+              className={`px-4 py-2 rounded-sm font-semibold transition-all ${
+                selectedFolder === folder
+                  ? 'bg-[#7D1D3F] text-white'
+                  : 'bg-white text-[#7D1D3F] hover:bg-gray-50'
+              }`}
+            >
+              📁 {folder} ({latestShiurim.filter(s => s.folder === folder).length})
+            </button>
+          ))}
         </div>
 
         <div className="grid lg:grid-cols-3 gap-12">
@@ -127,10 +208,10 @@ const Shiurim: React.FC = () => {
           <div className="lg:col-span-2">
             <h2 className="text-2xl mb-8 flex items-center gap-2 text-[#2C3E50]">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
-              Latest Audio Shiurim
+              {selectedFolder === 'All' ? 'Latest Audio Shiurim' : `${selectedFolder} Shiurim`}
             </h2>
             <div className="space-y-4">
-              {latestShiurim.map((shiur, idx) => (
+              {filteredShiurim.map((shiur, idx) => (
                 <div key={shiur.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:bg-gray-50 transition-colors">
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex gap-4 items-center flex-1">
@@ -140,6 +221,7 @@ const Shiurim: React.FC = () => {
                       <div className="flex-1">
                         <h4 className="font-bold text-[#2C3E50]">{shiur.title}</h4>
                         <p className="text-sm text-gray-500">{shiur.speaker} • {shiur.duration}</p>
+                        {shiur.folder && <p className="text-xs text-gray-400 mt-1">📁 {shiur.folder}</p>}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -313,6 +395,21 @@ const Shiurim: React.FC = () => {
                   </div>
 
                   <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Folder</label>
+                    <select
+                      value={uploadData.folder}
+                      onChange={(e) => setUploadData({...uploadData, folder: e.target.value})}
+                      className="w-full px-4 py-3 border border-[#eaeaea] rounded-sm focus:outline-none focus:border-[#1a5f7a] transition-colors"
+                      required
+                    >
+                      <option value="">Select folder</option>
+                      {folders.map(folder => (
+                        <option key={folder} value={folder}>{folder}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Audio File</label>
                     <input
                       type="file"
@@ -396,6 +493,19 @@ const Shiurim: React.FC = () => {
                   <option value="Hashkafa">Hashkafa</option>
                 </select>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Folder</label>
+                <select
+                  value={editingShiur.folder || 'General'}
+                  onChange={(e) => setEditingShiur({...editingShiur, folder: e.target.value})}
+                  className="w-full px-4 py-3 border border-[#eaeaea] rounded-sm focus:outline-none focus:border-[#1a5f7a] transition-colors"
+                >
+                  {folders.map(folder => (
+                    <option key={folder} value={folder}>{folder}</option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <button
@@ -403,6 +513,77 @@ const Shiurim: React.FC = () => {
               className="w-full mt-6 bg-[#7D1D3F] text-white py-3 rounded-sm font-semibold hover:bg-[#9B5027] transition-all uppercase text-xs tracking-wider"
             >
               Save Changes
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Folder Manager Modal */}
+      {showFolderManager && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-8 relative">
+            <button
+              onClick={() => setShowFolderManager(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <h3 className="text-2xl serif font-semibold text-[#2C3E50] mb-6">Manage Folders</h3>
+            
+            <div className="mb-6">
+              <div className="flex gap-2 mb-4">
+                <input
+                  type="text"
+                  value={newFolderName}
+                  onChange={(e) => setNewFolderName(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && addFolder()}
+                  className="flex-1 px-4 py-2 border border-[#eaeaea] rounded-sm focus:outline-none focus:border-[#1a5f7a] transition-colors"
+                  placeholder="New folder name"
+                />
+                <button
+                  onClick={addFolder}
+                  className="bg-[#7D1D3F] text-white px-6 py-2 rounded-sm font-semibold hover:bg-[#9B5027] transition-all"
+                >
+                  Add
+                </button>
+              </div>
+
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {folders.map(folder => (
+                  <div key={folder} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <div className="flex items-center gap-2">
+                      <svg className="w-5 h-5 text-[#C9963F]" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
+                      </svg>
+                      <span className="font-medium text-[#2C3E50]">{folder}</span>
+                      <span className="text-sm text-gray-500">
+                        ({latestShiurim.filter(s => s.folder === folder).length} shiurim)
+                      </span>
+                    </div>
+                    {folder !== 'General' && (
+                      <button
+                        onClick={() => deleteFolder(folder)}
+                        className="text-red-600 hover:text-red-800 p-1"
+                        title="Delete folder"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowFolderManager(false)}
+              className="w-full bg-gray-200 text-gray-700 py-3 rounded-sm font-semibold hover:bg-gray-300 transition-all uppercase text-xs tracking-wider"
+            >
+              Close
             </button>
           </div>
         </div>
