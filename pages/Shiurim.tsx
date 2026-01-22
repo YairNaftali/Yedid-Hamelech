@@ -156,23 +156,15 @@ const Shiurim: React.FC = () => {
         <div className="flex justify-between items-end mb-16">
           <h1 className="text-5xl text-[#2C3E50]">Shiurim</h1>
           {isAdmin && (
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowFolderManager(true)}
-                className="bg-[#C9963F] text-white px-6 py-2 rounded-sm text-sm font-semibold hover:bg-[#b8853a] transition-all uppercase tracking-wider"
-              >
-                Manage Folders
-              </button>
-              <button
-                onClick={() => {
-                  setIsAdmin(false);
-                  setIsAuthenticated(false);
-                }}
-                className="bg-gray-500 text-white px-6 py-2 rounded-sm text-sm font-semibold hover:bg-gray-600 transition-all uppercase tracking-wider"
-              >
-                Exit Admin Mode
-              </button>
-            </div>
+            <button
+              onClick={() => {
+                setIsAdmin(false);
+                setIsAuthenticated(false);
+              }}
+              className="bg-gray-500 text-white px-6 py-2 rounded-sm text-sm font-semibold hover:bg-gray-600 transition-all uppercase tracking-wider"
+            >
+              Exit Admin Mode
+            </button>
           )}
         </div>
 
@@ -201,6 +193,14 @@ const Shiurim: React.FC = () => {
               📁 {folder} ({latestShiurim.filter(s => s.folder === folder).length})
             </button>
           ))}
+          {isAdmin && (
+            <button
+              onClick={() => setShowFolderManager(true)}
+              className="px-4 py-2 rounded-sm font-semibold bg-[#C9963F] text-white hover:bg-[#b8853a] transition-all"
+            >
+              ➕ Manage Folders
+            </button>
+          )}
         </div>
 
         <div className="grid lg:grid-cols-3 gap-12">
