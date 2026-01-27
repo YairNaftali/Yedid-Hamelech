@@ -27,16 +27,15 @@ const Application: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const form = e.target as HTMLFormElement;
-      const formDataToSend = new FormData(form);
-      
-      const response = await fetch('/', {
+      const response = await fetch('/api/submit-application', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(formDataToSend as any).toString(),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
+      const result = await response.json();
+
+      if (result.success) {
         setSubmitSuccess(true);
         setFormData({
           firstName: '',
@@ -91,8 +90,7 @@ const Application: React.FC = () => {
               </button>
             </div>
           ) : (
-          <form onSubmit={handleSubmit} className="space-y-12" name="application" method="POST" data-netlify="true">
-            <input type="hidden" name="form-name" value="application" />
+          <form onSubmit={handleSubmit} className="space-y-12">
             
             {/* Personal Information */}
             <div>
