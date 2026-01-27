@@ -19,11 +19,49 @@ const Application: React.FC = () => {
     essay: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Connect to backend to send email to yedidhamelech@gmail.com
-    // For now, showing success message
-    alert(`Application successfully submitted! Our hanhala will review your information and be in touch soon at ${formData.email}.`);
+    setIsSubmitting(true);
+
+    try {
+      const form = e.target as HTMLFormElement;
+      const formDataToSend = new FormData(form);
+      
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(formDataToSend as any).toString(),
+      });
+
+      if (response.ok) {
+        setSubmitSuccess(true);
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          dob: '',
+          address: '',
+          city: '',
+          state: '',
+          zip: '',
+          highSchool: '',
+          currentYeshiva: '',
+          rabbiReference: '',
+          rabbiPhone: '',
+          essay: '',
+        });
+      } else {
+        alert('There was an error submitting your application. Please try again or contact us directly.');
+      }
+    } catch (error) {
+      alert('There was an error submitting your application. Please try again or contact us directly.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -40,7 +78,21 @@ const Application: React.FC = () => {
         </div>
 
         <div className="bg-white shadow-2xl rounded p-8 md:p-16 border-t-8 border-[#1a5f7a]">
-          <form onSubmit={handleSubmit} className="space-y-12">
+          {submitSuccess ? (
+            <div className="text-center py-16">
+              <div className="text-6xl mb-6">✓</div>
+              <h2 className="text-3xl serif font-semibold text-[#0F1729] mb-4">Application Submitted!</h2>
+              <p className="text-gray-600 mb-8">Thank you for applying to Yeshivas Yedid Hamelech. Our hanhala will review your application and be in touch soon.</p>
+              <button 
+                onClick={() => setSubmitSuccess(false)}
+                className="bg-[#1a5f7a] text-white px-8 py-3 text-xs font-bold uppercase tracking-[0.3em] rounded hover:bg-[#C9963F] transition-all"
+              >
+                Submit Another Application
+              </button>
+            </div>
+          ) : (
+          <form onSubmit={handleSubmit} className="space-y-12" name="application" method="POST" data-netlify="true">
+            <input type="hidden" name="form-name" value="application" />
             
             {/* Personal Information */}
             <div>
@@ -80,11 +132,16 @@ const Application: React.FC = () => {
               </div>
             </div>
 
-            {/* Essay */}
-            <div className="space-y-4">
-              <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">What are your goals for this coming year?</label>
-              <textarea 
-                name="essay" 
+                type="submit" 
+                disabled={isSubmitting}
+                className="w-full bg-[#7D1D3F] text-white py-6 text-xs font-bold uppercase tracking-[0.4em] rounded shadow-2xl hover:bg-[#C9963F] hover:text-[#2C3E50] transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                {isSubmitting ? 'Submitting...' : 'Submit Formal Application'}
+              </button>
+              <p className="mt-6 text-center text-xs text-gray-400 italic">By clicking submit, you acknowledge that all information provided is accurate and true.</p>
+            </div>
+          </form>
+          )}ame="essay" 
                 onChange={handleChange} 
                 rows={6} 
                 className="w-full bg-[#fcfaf5] border-2 border-gray-100 rounded-lg p-6 focus:border-[#d4af37] outline-none text-gray-800 transition-all"
