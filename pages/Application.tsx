@@ -98,19 +98,19 @@ const Application: React.FC = () => {
               <div className="grid md:grid-cols-2 gap-8">
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">First Name</label>
-                  <input required name="firstName" onChange={handleChange} className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="text" />
+                  <input required name="firstName" value={formData.firstName} onChange={handleChange} className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="text" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Last Name</label>
-                  <input required name="lastName" onChange={handleChange} className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="text" />
+                  <input required name="lastName" value={formData.lastName} onChange={handleChange} className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="text" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Email Address</label>
-                  <input required name="email" onChange={handleChange} className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="email" />
+                  <input required name="email" value={formData.email} onChange={handleChange} className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="email" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Primary Phone</label>
-                  <input required name="phone" onChange={handleChange} className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="tel" />
+                  <input required name="phone" value={formData.phone} onChange={handleChange} className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="tel" />
                 </div>
               </div>
             </div>
@@ -121,15 +121,30 @@ const Application: React.FC = () => {
               <div className="grid md:grid-cols-2 gap-8">
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Current Yeshiva</label>
-                  <input required name="currentYeshiva" onChange={handleChange} className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="text" />
+                  <input required name="currentYeshiva" value={formData.currentYeshiva} onChange={handleChange} className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="text" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Reference Rabbi</label>
-                  <input required name="rabbiReference" onChange={handleChange} className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="text" />
+                  <input required name="rabbiReference" value={formData.rabbiReference} onChange={handleChange} className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="text" />
                 </div>
               </div>
             </div>
 
+            {/* Essay */}
+            <div className="space-y-4">
+              <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">What are your goals for this coming year?</label>
+              <textarea 
+                name="essay" 
+                value={formData.essay}
+                onChange={handleChange} 
+                rows={6} 
+                className="w-full bg-[#fcfaf5] border-2 border-gray-100 rounded-lg p-6 focus:border-[#d4af37] outline-none text-gray-800 transition-all"
+                placeholder="Tell us about your aspirations and why you believe Yedid Hamelech is the right fit..."
+              ></textarea>
+            </div>
+
+            <div className="pt-6">
+              <button 
                 type="submit" 
                 disabled={isSubmitting}
                 className="w-full bg-[#7D1D3F] text-white py-6 text-xs font-bold uppercase tracking-[0.4em] rounded shadow-2xl hover:bg-[#C9963F] hover:text-[#2C3E50] transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
@@ -139,21 +154,7 @@ const Application: React.FC = () => {
               <p className="mt-6 text-center text-xs text-gray-400 italic">By clicking submit, you acknowledge that all information provided is accurate and true.</p>
             </div>
           </form>
-          )}ame="essay" 
-                onChange={handleChange} 
-                rows={6} 
-                className="w-full bg-[#fcfaf5] border-2 border-gray-100 rounded-lg p-6 focus:border-[#d4af37] outline-none text-gray-800 transition-all"
-                placeholder="Tell us about your aspirations and why you believe Yedid Hamelech is the right fit..."
-              ></textarea>
-            </div>
-
-            <div className="pt-6">
-              <button type="submit" className="w-full bg-[#7D1D3F] text-white py-6 text-xs font-bold uppercase tracking-[0.4em] rounded shadow-2xl hover:bg-[#C9963F] hover:text-[#2C3E50] transition-all transform hover:-translate-y-1">
-                Submit Formal Application
-              </button>
-              <p className="mt-6 text-center text-xs text-gray-400 italic">By clicking submit, you acknowledge that all information provided is accurate and true.</p>
-            </div>
-          </form>
+          )}
         </div>
       </div>
     </div>
