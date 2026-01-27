@@ -27,10 +27,13 @@ const Application: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/submit-application', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+      const form = e.target as HTMLFormElement;
+      const formDataToSend = new FormData(form);
+      formDataToSend.append("access_key", "3023281a-abf3-4b3d-a9f9-06639b467c07");
+
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formDataToSend
       });
 
       const result = await response.json();
