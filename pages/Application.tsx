@@ -37,7 +37,6 @@ const Application: React.FC = () => {
           <span className="text-[#1a5f7a] text-xs font-semibold uppercase tracking-[0.25em] mb-4 block">Apply Now</span>
           <h1 className="text-4xl md:text-6xl text-[#0F1729] serif italic font-semibold mb-6">Application</h1>
           <p className="text-gray-600 italic">Please complete the form below with accuracy. Our staff will contact you shortly after submission.</p>
-          <p className="text-[#C9963F] font-semibold mt-4 text-lg">Application Fee: $160</p>
         </div>
 
         <div className="bg-white shadow-2xl rounded p-8 md:p-16 border-t-8 border-[#1a5f7a]">
