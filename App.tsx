@@ -37,7 +37,7 @@ const Navbar = () => {
           <Link to="/" className="flex items-center gap-4 group">
             <div className={`transition-all duration-300 ${scrolled ? 'w-12 h-12' : 'w-14 h-14'} flex items-center justify-center`}>
               <img 
-                src="/images/logo.png" 
+                src="/images/logo.svg" 
                 alt="Yeshivas Yedid Hamelech Logo" 
                 className="w-full h-full object-contain"
               />
