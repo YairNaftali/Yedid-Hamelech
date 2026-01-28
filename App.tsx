@@ -6,6 +6,7 @@ import Shiurim from './pages/Shiurim';
 import Podcast from './pages/Podcast';
 import Application from './pages/Application';
 import Contact from './pages/Contact';
+import logo from './public/images/logo.png';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,7 +38,7 @@ const Navbar = () => {
           <Link to="/" className="flex items-center gap-4 group">
             <div className={`transition-all duration-300 ${scrolled ? 'w-12 h-12' : 'w-14 h-14'} flex items-center justify-center`}>
               <img 
-                src="/images/logo.svg" 
+                src={logo} 
                 alt="Yeshivas Yedid Hamelech Logo" 
                 className="w-full h-full object-contain"
               />
