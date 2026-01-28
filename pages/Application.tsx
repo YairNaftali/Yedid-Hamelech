@@ -58,6 +58,10 @@ const Application: React.FC = () => {
             </div>
           ) : (
           <form onSubmit={handleSubmit} className="space-y-12">
+            {/* Web3Forms configuration */}
+            <input type="hidden" name="subject" value="New Yeshiva Application Submission" />
+            <input type="hidden" name="from_name" value="Yeshivas Yedid Hamelech Website" />
+            <input type="checkbox" name="botcheck" style={{ display: 'none' }} />
             
             {/* Personal Information */}
             <div>
