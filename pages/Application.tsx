@@ -58,7 +58,7 @@ const Application: React.FC = () => {
           ) : (
           <form onSubmit={handleSubmit} className="space-y-12">
             {/* Web3Forms configuration */}
-            <input type="hidden" name="access_key" value="3023281a-abf3-4b3d-a9f9-06639b467c07" />
+            <input type="hidden" name="access_key" value="b0c3a79a-a869-44cb-aa2a-d25cec1ffc14" />
             <input type="hidden" name="subject" value="New Yeshiva Application Submission" />
             <input type="hidden" name="from_name" value="Yeshivas Yedid Hamelech Website" />
             <input type="checkbox" name="botcheck" style={{ display: 'none' }} />
