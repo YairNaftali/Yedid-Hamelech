@@ -13,7 +13,7 @@ const Application: React.FC = () => {
     const formData = new FormData(form);
 
     try {
-      // Using Formspree - replace YOUR_FORM_ID with actual ID from formspree.io
+      console.log('Submitting to Formspree...');
       const response = await fetch("https://formspree.io/f/xqeqoebv", {
         method: "POST",
         body: formData,
@@ -22,13 +22,18 @@ const Application: React.FC = () => {
         }
       });
 
+      console.log('Response status:', response.status);
+      const data = await response.json();
+      console.log('Response data:', data);
+
       if (response.ok) {
         setSubmitSuccess(true);
         form.reset();
       } else {
-        alert('Error: Failed to submit application. Please try again.');
+        alert('Error: ' + (data.error || data.errors?.[0]?.message || 'Failed to submit application'));
       }
     } catch (error) {
+      console.error('Submission error:', error);
       alert('There was an error submitting your application. Please try again or contact us directly.');
     } finally {
       setIsSubmitting(false);
