@@ -21,6 +21,8 @@ const ShiurimBackend: React.FC = () => {
     duration: '' as string
   });
   const [uploadProgress, setUploadProgress] = useState('');
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
 
   const [latestShiurim, setLatestShiurim] = useState<Shiur[]>([]);
   const [folders, setFolders] = useState<string[]>(['General']);
@@ -29,6 +31,32 @@ const ShiurimBackend: React.FC = () => {
   useEffect(() => {
     loadData();
   }, []);
+
+  const playShiur = (shiur: Shiur) => {
+    if (!shiur.file_url) {
+      alert('No audio file available for this shiur');
+      return;
+    }
+
+    // Stop currently playing audio
+    if (audioElement) {
+      audioElement.pause();
+      audioElement.currentTime = 0;
+    }
+
+    if (playingId === shiur.id) {
+      // Toggle pause
+      setPlayingId(null);
+      setAudioElement(null);
+    } else {
+      // Play new audio
+      const audio = new Audio(shiur.file_url);
+      audio.play();
+      audio.onended = () => setPlayingId(null);
+      setPlayingId(shiur.id);
+      setAudioElement(audio);
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -208,22 +236,44 @@ const ShiurimBackend: React.FC = () => {
       return;
     }
 
-    // Validate duration format (basic check)
     if (!uploadData.duration.includes(':')) {
       alert('Duration must be in format MM:SS (e.g., 45:30)');
       return;
     }
 
+    if (!uploadData.file) {
+      alert('Please select an audio file');
+      return;
+    }
+
     try {
+      // Step 1: Upload file to Blob storage
+      setUploadProgress('Uploading audio file...');
+      const response = await fetch(`/api/shiurim/upload?password=${encodeURIComponent(password)}&filename=${encodeURIComponent(uploadData.file.name)}`, {
+        method: 'PUT',
+        body: uploadData.file,
+        headers: {
+          'Content-Type': uploadData.file.type,
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to upload file');
+      }
+
+      const uploadResult = await response.json();
+      const fileUrl = uploadResult.url;
+
+      // Step 2: Create shiur entry with file URL
       setUploadProgress('Creating shiur entry...');
-      
-      // Create the shiur entry
       const newShiur = await shiurimAPI.create(password, {
         title: uploadData.title,
         speaker: uploadData.speaker,
         duration: uploadData.duration,
         category: uploadData.category,
-        folder: uploadData.folder
+        folder: uploadData.folder,
+        fileUrl: fileUrl
       });
 
       setUploadProgress('');
@@ -240,6 +290,8 @@ const ShiurimBackend: React.FC = () => {
       const errorMsg = error.message || 'Failed to upload shiur';
       if (errorMsg.includes('DATABASE_URL')) {
         alert('Database not configured. Please set up Neon Postgres in Vercel Dashboard.');
+      } else if (errorMsg.includes('BLOB')) {
+        alert('Blob storage not configured. Please set up Vercel Blob in Vercel Dashboard.');
       } else {
         alert('Failed to upload shiur: ' + errorMsg);
       }
@@ -332,8 +384,15 @@ const ShiurimBackend: React.FC = () => {
                   <div key={shiur.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:bg-gray-50 transition-colors">
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex gap-4 items-center flex-1">
-                        <button className="w-12 h-12 bg-[#7D1D3F] text-white rounded-full flex items-center justify-center hover:bg-[#C9963F] transition-colors flex-shrink-0">
+                      <button 
+                        onClick={() => playShiur(shiur)}
+                        className="w-12 h-12 bg-[#7D1D3F] text-white rounded-full flex items-center justify-center hover:bg-[#C9963F] transition-colors flex-shrink-0"
+                      >
+                        {playingId === shiur.id ? (
+                          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4h3v12H5V4zm7 0h3v12h-3V4z"/></svg>
+                        ) : (
                           <svg className="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M4.5 3.5v13L16 10l-11.5-6.5z"/></svg>
+                        )}
                         </button>
                         <div className="flex-1">
                           <h4 className="font-bold text-[#2C3E50]">{shiur.title}</h4>

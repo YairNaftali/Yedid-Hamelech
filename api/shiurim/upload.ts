@@ -6,9 +6,7 @@ const ADMIN_PASSWORD = process.env.SHIURIM_ADMIN_PASSWORD || 'Admin2025';
 
 export const config = {
   api: {
-    bodyParser: {
-      sizeLimit: '100mb', // Allow large audio files
-    },
+    bodyParser: false, // Disable body parsing for file upload
   },
 };
 
@@ -16,26 +14,27 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ) {
-  if (req.method !== 'POST') {
+  if (req.method !== 'PUT') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
   try {
-    const { password, fileName, fileData } = req.body;
+    // Get password from query params
+    const password = req.query.password as string;
 
     // Verify password
     if (password !== UPLOAD_PASSWORD && password !== ADMIN_PASSWORD) {
       return res.status(401).json({ success: false, message: 'Invalid password' });
     }
 
-    if (!fileData) {
-      return res.status(400).json({ success: false, message: 'No file data provided' });
+    const filename = req.query.filename as string;
+    if (!filename) {
+      return res.status(400).json({ success: false, message: 'Filename required' });
     }
 
     // Upload to Vercel Blob
-    const blob = await put(`shiurim/${fileName}`, fileData, {
+    const blob = await put(`shiurim/${filename}`, req, {
       access: 'public',
-      addRandomSuffix: false,
     });
 
     return res.status(200).json({
@@ -47,7 +46,7 @@ export default async function handler(
     console.error('Error uploading file:', error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to upload file'
+      message: error instanceof Error ? error.message : 'Failed to upload file'
     });
   }
 }

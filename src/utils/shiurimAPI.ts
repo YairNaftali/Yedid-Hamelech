@@ -9,7 +9,7 @@ export interface Shiur {
   duration: string;
   category: string;
   folder?: string;
-  fileUrl?: string;
+  file_url?: string;
   createdAt?: string;
   updatedAt?: string;
 }
