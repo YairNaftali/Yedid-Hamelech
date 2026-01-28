@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
-import Shiurim from './pages/Shiurim';
+import Shiurim from './pages/ShiurimBackend';
 import Podcast from './pages/Podcast';
 import Application from './pages/Application';
 import Contact from './pages/Contact';
