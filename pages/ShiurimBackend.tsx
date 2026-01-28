@@ -15,11 +15,12 @@ const ShiurimBackend: React.FC = () => {
   const [uploadData, setUploadData] = useState({
     title: '',
     speaker: '',
-    duration: '',
     category: '',
     folder: '',
-    file: null as File | null
+    file: null as File | null,
+    duration: '' as string
   });
+  const [uploadProgress, setUploadProgress] = useState('');
 
   const [latestShiurim, setLatestShiurim] = useState<Shiur[]>([]);
   const [folders, setFolders] = useState<string[]>(['General']);
@@ -154,9 +155,40 @@ const ShiurimBackend: React.FC = () => {
     }
   };
 
+  const handleFileSelect = (file: File | null) => {
+    if (!file) {
+      setUploadData({ ...uploadData, file: null, duration: '' });
+      return;
+    }
+
+    // Auto-detect duration from audio file
+    const audio = new Audio();
+    audio.preload = 'metadata';
+    audio.onloadedmetadata = () => {
+      const minutes = Math.floor(audio.duration / 60);
+      const seconds = Math.floor(audio.duration % 60);
+      const duration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      setUploadData({ ...uploadData, file, duration });
+      URL.revokeObjectURL(audio.src);
+    };
+    audio.onerror = () => {
+      setUploadData({ ...uploadData, file, duration: '0:00' });
+      URL.revokeObjectURL(audio.src);
+    };
+    audio.src = URL.createObjectURL(file);
+  };
+
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!uploadData.duration) {
+      alert('Please wait for the audio file to load...');
+      return;
+    }
+
     try {
+      setUploadProgress('Creating shiur entry...');
+      
       // Create the shiur entry
       const newShiur = await shiurimAPI.create(password, {
         title: uploadData.title,
@@ -166,22 +198,23 @@ const ShiurimBackend: React.FC = () => {
         folder: uploadData.folder
       });
 
-      // If there's a file, upload it
-      if (uploadData.file) {
-        // TODO: Integrate with cloud storage (Cloudinary, S3, etc.)
-        console.log('File upload would happen here:', uploadData.file);
-      }
-
+      setUploadProgress('');
       await loadData();
       setShowUploadModal(false);
       setIsAuthenticated(false);
       setIsAdmin(false);
       setPassword('');
-      setUploadData({ title: '', speaker: '', duration: '', category: '', folder: '', file: null });
+      setUploadData({ title: '', speaker: '', category: '', folder: '', file: null, duration: '' });
       alert('Shiur uploaded successfully!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading shiur:', error);
-      alert('Failed to upload shiur');
+      setUploadProgress('');
+      const errorMsg = error.message || 'Failed to upload shiur';
+      if (errorMsg.includes('DATABASE_URL')) {
+        alert('Database not configured. Please set up Neon Postgres in Vercel Dashboard.');
+      } else {
+        alert('Failed to upload shiur: ' + errorMsg);
+      }
     }
   };
 
@@ -432,18 +465,6 @@ const ShiurimBackend: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Duration</label>
-                    <input
-                      type="text"
-                      value={uploadData.duration}
-                      onChange={(e) => setUploadData({...uploadData, duration: e.target.value})}
-                      className="w-full px-4 py-3 border border-[#eaeaea] rounded-sm focus:outline-none focus:border-[#1a5f7a] transition-colors"
-                      placeholder="e.g., 45:00"
-                      required
-                    />
-                  </div>
-
-                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
                     <select
                       value={uploadData.category}
@@ -475,23 +496,33 @@ const ShiurimBackend: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Audio File (Optional)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Audio File</label>
                     <input
                       type="file"
                       accept="audio/*"
-                      onChange={(e) => setUploadData({...uploadData, file: e.target.files?.[0] || null})}
+                      onChange={(e) => handleFileSelect(e.target.files?.[0] || null)}
                       className="w-full px-4 py-3 border border-[#eaeaea] rounded-sm focus:outline-none focus:border-[#1a5f7a] transition-colors"
+                      required
                     />
-                    <p className="text-xs text-gray-500 mt-1">File upload integration coming soon</p>
+                    {uploadData.duration && (
+                      <p className="text-xs text-green-600 mt-1">✓ Duration detected: {uploadData.duration}</p>
+                    )}
+                    {uploadData.file && !uploadData.duration && (
+                      <p className="text-xs text-gray-500 mt-1">Detecting duration...</p>
+                    )}
                   </div>
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full mt-6 bg-[#7D1D3F] text-white py-3 rounded-sm font-semibold hover:bg-[#9B5027] transition-all uppercase text-xs tracking-wider"
+                  disabled={!!uploadProgress || !uploadData.duration}
+                  className="w-full mt-6 bg-[#7D1D3F] text-white py-3 rounded-sm font-semibold hover:bg-[#9B5027] transition-all uppercase text-xs tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Upload Shiur
+                  {uploadProgress || 'Upload Shiur'}
                 </button>
+                {uploadProgress && (
+                  <p className="text-center text-sm text-gray-600 mt-2">{uploadProgress}</p>
+                )}
               </form>
             )}
           </div>
