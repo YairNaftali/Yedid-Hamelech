@@ -36,9 +36,11 @@ const ShiurimBackend: React.FC = () => {
       const data = await shiurimAPI.getAll();
       setLatestShiurim(data.shiurim);
       setFolders(data.folders);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading shiurim:', error);
-      alert('Failed to load shiurim. Please refresh the page.');
+      // Don't alert on initial load - just use empty data
+      setLatestShiurim([]);
+      setFolders(['General']);
     } finally {
       setLoading(false);
     }
@@ -164,18 +166,38 @@ const ShiurimBackend: React.FC = () => {
     // Auto-detect duration from audio file
     const audio = new Audio();
     audio.preload = 'metadata';
+    
+    const audioUrl = URL.createObjectURL(file);
+    audio.src = audioUrl;
+    
     audio.onloadedmetadata = () => {
-      const minutes = Math.floor(audio.duration / 60);
-      const seconds = Math.floor(audio.duration % 60);
-      const duration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-      setUploadData({ ...uploadData, file, duration });
-      URL.revokeObjectURL(audio.src);
+      if (audio.duration && audio.duration !== Infinity) {
+        const minutes = Math.floor(audio.duration / 60);
+        const seconds = Math.floor(audio.duration % 60);
+        const duration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        setUploadData({ ...uploadData, file, duration });
+      } else {
+        // Fallback for files where duration isn't immediately available
+        setTimeout(() => {
+          if (audio.duration && audio.duration !== Infinity) {
+            const minutes = Math.floor(audio.duration / 60);
+            const seconds = Math.floor(audio.duration % 60);
+            const duration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            setUploadData({ ...uploadData, file, duration });
+          } else {
+            // If still can't detect, allow manual override
+            setUploadData({ ...uploadData, file, duration: '0:00' });
+          }
+        }, 500);
+      }
+      URL.revokeObjectURL(audioUrl);
     };
+    
     audio.onerror = () => {
+      console.error('Error loading audio file');
       setUploadData({ ...uploadData, file, duration: '0:00' });
-      URL.revokeObjectURL(audio.src);
+      URL.revokeObjectURL(audioUrl);
     };
-    audio.src = URL.createObjectURL(file);
   };
 
   const handleUploadSubmit = async (e: React.FormEvent) => {
@@ -291,8 +313,12 @@ const ShiurimBackend: React.FC = () => {
             </h2>
             
             {filteredShiurim.length === 0 ? (
-              <div className="bg-white p-12 rounded-lg text-center text-gray-500">
-                <p>No shiurim found in this folder.</p>
+              <div className="bg-white p-12 rounded-lg text-center">
+                <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                </svg>
+                <p className="text-gray-500 mb-2">No shiurim found in this folder.</p>
+                <p className="text-sm text-gray-400">Upload your first shiur to get started!</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -499,23 +525,36 @@ const ShiurimBackend: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Audio File</label>
                     <input
                       type="file"
-                      accept="audio/*"
+                      accept="audio/*,.m4a,.mp3,.wav,.aac"
                       onChange={(e) => handleFileSelect(e.target.files?.[0] || null)}
                       className="w-full px-4 py-3 border border-[#eaeaea] rounded-sm focus:outline-none focus:border-[#1a5f7a] transition-colors"
                       required
                     />
-                    {uploadData.duration && (
+                    {uploadData.duration && uploadData.duration !== '0:00' && (
                       <p className="text-xs text-green-600 mt-1">✓ Duration detected: {uploadData.duration}</p>
                     )}
                     {uploadData.file && !uploadData.duration && (
                       <p className="text-xs text-gray-500 mt-1">Detecting duration...</p>
+                    )}
+                    {uploadData.duration === '0:00' && uploadData.file && (
+                      <div className="mt-2">
+                        <p className="text-xs text-orange-600 mb-1">⚠ Duration auto-detection failed. Please enter manually:</p>
+                        <input
+                          type="text"
+                          value={uploadData.duration}
+                          onChange={(e) => setUploadData({...uploadData, duration: e.target.value})}
+                          className="w-full px-3 py-2 border border-[#eaeaea] rounded-sm text-sm focus:outline-none focus:border-[#1a5f7a]"
+                          placeholder="e.g., 45:30"
+                          pattern="[0-9]+:[0-5][0-9]"
+                        />
+                      </div>
                     )}
                   </div>
                 </div>
 
                 <button
                   type="submit"
-                  disabled={!!uploadProgress || !uploadData.duration}
+                  disabled={!!uploadProgress || (!uploadData.duration || uploadData.duration === '')}
                   className="w-full mt-6 bg-[#7D1D3F] text-white py-3 rounded-sm font-semibold hover:bg-[#9B5027] transition-all uppercase text-xs tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {uploadProgress || 'Upload Shiur'}
