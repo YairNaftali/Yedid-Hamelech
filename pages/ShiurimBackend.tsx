@@ -506,8 +506,7 @@ const ShiurimBackend: React.FC = () => {
             <button
               onClick={() => {
                 setShowUploadModal(false);
-                setIsAuthenticated(false);
-                setPassword('');
+                // Keep authentication active when closing modal
               }}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
             >
