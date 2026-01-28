@@ -31,6 +31,21 @@ export default async function handler(
       return res.status(401).json({ success: false, message: 'Invalid password' });
     }
 
+    // Ensure table exists
+    await sql`
+      CREATE TABLE IF NOT EXISTS shiurim (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        speaker TEXT NOT NULL,
+        duration TEXT NOT NULL,
+        category TEXT NOT NULL,
+        folder TEXT NOT NULL,
+        file_url TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+
     const id = Date.now().toString();
     const result = await sql`
       INSERT INTO shiurim (id, title, speaker, duration, category, folder, file_url)
@@ -45,9 +60,10 @@ export default async function handler(
     });
   } catch (error) {
     console.error('Error creating shiur:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return res.status(500).json({
       success: false,
-      message: 'Failed to create shiur'
+      message: errorMessage
     });
   }
 }
