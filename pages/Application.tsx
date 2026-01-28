@@ -14,7 +14,7 @@ const Application: React.FC = () => {
 
     try {
       // Using Formspree - replace YOUR_FORM_ID with actual ID from formspree.io
-      const response = await fetch("https://formspree.io/f/xanyoprv", {
+      const response = await fetch("https://formspree.io/f/xqeqoebv", {
         method: "POST",
         body: formData,
         headers: {
