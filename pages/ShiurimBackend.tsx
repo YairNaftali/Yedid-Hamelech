@@ -148,14 +148,27 @@ const ShiurimBackend: React.FC = () => {
   };
 
   const handleDeleteShiur = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this shiur?')) return;
+    if (!confirm('Are you sure you want to delete this shiur? This will also delete the audio file.')) return;
+    
+    if (!password) {
+      alert('Session expired. Please re-authenticate.');
+      setIsAdmin(false);
+      return;
+    }
+    
     try {
       await shiurimAPI.delete(password, id);
       await loadData();
       alert('Shiur deleted successfully');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting shiur:', error);
-      alert('Failed to delete shiur');
+      const errorMsg = error.message || 'Failed to delete shiur';
+      if (errorMsg.includes('Admin access required')) {
+        alert('Admin password required to delete shiurim. Please re-authenticate with admin password.');
+        setIsAdmin(false);
+      } else {
+        alert('Failed to delete shiur: ' + errorMsg);
+      }
     }
   };
 

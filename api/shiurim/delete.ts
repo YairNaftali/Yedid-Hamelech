@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { neon } from '@neondatabase/serverless';
+import { del } from '@vercel/blob';
 
 const sql = neon(process.env.DATABASE_URL!);
 const ADMIN_PASSWORD = process.env.SHIURIM_ADMIN_PASSWORD || 'Admin2025';
@@ -19,14 +20,28 @@ export default async function handler(
       return res.status(401).json({ success: false, message: 'Admin access required' });
     }
 
-    const result = await sql`
-      DELETE FROM shiurim 
-      WHERE id = ${id}
-      RETURNING id
+    // Get shiur to find file_url before deleting
+    const shiur = await sql`
+      SELECT file_url FROM shiurim WHERE id = ${id}
     `;
 
-    if (result.length === 0) {
+    if (shiur.length === 0) {
       return res.status(404).json({ success: false, message: 'Shiur not found' });
+    }
+
+    // Delete from database
+    await sql`
+      DELETE FROM shiurim WHERE id = ${id}
+    `;
+
+    // Delete file from Blob storage if it exists
+    if (shiur[0].file_url) {
+      try {
+        await del(shiur[0].file_url);
+      } catch (blobError) {
+        console.error('Error deleting blob file:', blobError);
+        // Continue even if blob deletion fails
+      }
     }
 
     return res.status(200).json({
@@ -37,7 +52,7 @@ export default async function handler(
     console.error('Error deleting shiur:', error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to delete shiur'
+      message: error instanceof Error ? error.message : 'Failed to delete shiur'
     });
   }
 }
