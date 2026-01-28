@@ -6,7 +6,7 @@ import Shiurim from './pages/Shiurim';
 import Podcast from './pages/Podcast';
 import Application from './pages/Application';
 import Contact from './pages/Contact';
-import logo from './public/images/logo.png';
+import logo from './src/images/logo.png';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
