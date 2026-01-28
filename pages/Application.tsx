@@ -13,18 +13,20 @@ const Application: React.FC = () => {
     const formData = new FormData(form);
 
     try {
-      const response = await fetch("https://api.web3forms.com/submit", {
+      // Using Formspree - replace YOUR_FORM_ID with actual ID from formspree.io
+      const response = await fetch("https://formspree.io/f/xanyoprv", {
         method: "POST",
-        body: formData
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
       });
 
-      const data = await response.json();
-
-      if (data.success) {
+      if (response.ok) {
         setSubmitSuccess(true);
         form.reset();
       } else {
-        alert('Error: ' + (data.message || 'Failed to submit application'));
+        alert('Error: Failed to submit application. Please try again.');
       }
     } catch (error) {
       alert('There was an error submitting your application. Please try again or contact us directly.');
@@ -57,11 +59,7 @@ const Application: React.FC = () => {
             </div>
           ) : (
           <form onSubmit={handleSubmit} className="space-y-12">
-            {/* Web3Forms configuration */}
-            <input type="hidden" name="access_key" value="b0c3a79a-a869-44cb-aa2a-d25cec1ffc14" />
-            <input type="hidden" name="subject" value="New Yeshiva Application Submission" />
-            <input type="hidden" name="from_name" value="Yeshivas Yedid Hamelech Website" />
-            <input type="checkbox" name="botcheck" style={{ display: 'none' }} />
+            {/* Form fields - removed Web3Forms config */}
             
             {/* Personal Information */}
             <div>
