@@ -1,14 +1,16 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { put } from '@vercel/blob';
 
 const UPLOAD_PASSWORD = process.env.SHIURIM_UPLOAD_PASSWORD || 'YedidHamelech2025';
 const ADMIN_PASSWORD = process.env.SHIURIM_ADMIN_PASSWORD || 'Admin2025';
 
-// This endpoint handles file upload URLs
-// You can integrate with services like:
-// - Cloudinary
-// - AWS S3
-// - Google Cloud Storage
-// - Uploadcare
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '100mb', // Allow large audio files
+    },
+  },
+};
 
 export default async function handler(
   req: VercelRequest,
@@ -19,42 +21,33 @@ export default async function handler(
   }
 
   try {
-    const { password, fileName, fileType } = req.body;
+    const { password, fileName, fileData } = req.body;
 
     // Verify password
     if (password !== UPLOAD_PASSWORD && password !== ADMIN_PASSWORD) {
       return res.status(401).json({ success: false, message: 'Invalid password' });
     }
 
-    // For now, return a placeholder response
-    // In production, you'd generate a signed upload URL here
-    
-    // Example with Cloudinary:
-    // const cloudinary = require('cloudinary').v2;
-    // cloudinary.config({
-    //   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    //   api_key: process.env.CLOUDINARY_API_KEY,
-    //   api_secret: process.env.CLOUDINARY_API_SECRET
-    // });
-    // const timestamp = Math.round(Date.now() / 1000);
-    // const signature = cloudinary.utils.api_sign_request({
-    //   timestamp: timestamp,
-    //   upload_preset: 'shiurim_preset'
-    // }, process.env.CLOUDINARY_API_SECRET);
+    if (!fileData) {
+      return res.status(400).json({ success: false, message: 'No file data provided' });
+    }
+
+    // Upload to Vercel Blob
+    const blob = await put(`shiurim/${fileName}`, fileData, {
+      access: 'public',
+      addRandomSuffix: false,
+    });
 
     return res.status(200).json({
       success: true,
-      message: 'Upload endpoint ready - integrate with cloud storage',
-      // uploadUrl: 'your-upload-url',
-      // For demo purposes, return a mock URL
-      uploadUrl: 'https://example.com/upload',
-      publicUrl: 'https://example.com/files/' + fileName
+      url: blob.url,
+      message: 'File uploaded successfully'
     });
   } catch (error) {
-    console.error('Error generating upload URL:', error);
+    console.error('Error uploading file:', error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to generate upload URL'
+      message: 'Failed to upload file'
     });
   }
 }

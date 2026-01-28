@@ -2,10 +2,22 @@
 
 ## Overview
 This backend system provides a complete API for managing shiurim (Torah lectures) with:
-- CRUD operations for shiurim
+- CRUD operations for shiurim (metadata stored in Postgres)
+- File upload to Vercel Blob (audio files stored separately)
 - Folder management
 - Authentication
-- File upload support (ready for cloud storage integration)
+
+## Architecture
+
+**Neon Postgres Database** (0.5GB - plenty for metadata)
+- Stores shiur metadata: titles, speakers, durations, categories
+- Each record is only a few KB
+
+**Vercel Blob Storage** (larger limits for files)
+- Stores actual audio recordings (MP3s, etc.)
+- Database only stores the URL to the blob
+
+This separation ensures your database doesn't run out of space!
 
 ## API Endpoints
 
@@ -116,58 +128,47 @@ Manages folders (requires admin).
 Add these to your Vercel project settings:
 
 ```bash
-# Required for Neon Postgres database
+# Required - Auto-added by Vercel when you create the databases
 DATABASE_URL=your_neon_database_url
+BLOB_READ_WRITE_TOKEN=your_blob_token
 
 # Optional: Override default passwords
 SHIURIM_UPLOAD_PASSWORD=YedidHamelech2025
 SHIURIM_ADMIN_PASSWORD=Admin2025
 ```
 
-## Setting Up Neon Postgres
+## Setting Up Storage
 
-1. **Go to Vercel Dashboard:**
-   - Navigate to your project
-   - Go to "Storage" tab
-   - Click "Create Database" or "Browse Storage"
+### 1. Neon Postgres (for metadata)
+1. Go to Vercel Dashboard → your project
+2. Click "Storage" tab → "Create Database"
+3. Select **"Neon"** (Serverless Postgres)
+4. Complete setup - adds `DATABASE_URL` automatically
 
-2. **Create Neon Postgres Database:**
-   - Select "Neon" from the Marketplace Database Providers
-   - Click "Continue"
-   - Follow the setup wizard
-   - Vercel will automatically add `DATABASE_URL` environment variable
+### 2. Vercel Blob (for audio files)
+1. In same Storage tab, click "Create Database" again
+2. Select **"Blob"** (Fast object storage)
+3. Complete setup - adds `BLOB_READ_WRITE_TOKEN` automatically
 
-3. **Database Tables:**
-   - Tables are automatically created on first API request
-   - `shiurim` table stores all shiur information
-   - `folders` table stores folder names
-   - "General" folder is created automatically
+Both are needed for the full shiurim system!
 
 ## File Upload Integration
 
-The upload endpoint is ready for cloud storage integration. Popular options:
+The upload endpoint now uses Vercel Blob for storing audio files.
 
-### Option 1: Cloudinary
-```bash
-npm install cloudinary
-```
+**How it works:**
+1. User uploads an audio file through the form
+2. File is sent to `/api/shiurim/upload`
+3. File is stored in Vercel Blob storage
+4. The blob URL is saved in the database with the shiur metadata
 
-Set environment variables:
-```bash
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-```
+**Vercel Blob Benefits:**
+- Designed for large files
+- Fast CDN delivery
+- Automatic scaling
+- Pay only for what you use
 
-### Option 2: AWS S3
-```bash
-npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
-```
-
-### Option 3: Google Cloud Storage
-```bash
-npm install @google-cloud/storage
-```
+No additional configuration needed - just create the Blob storage in Vercel!
 
 ## Frontend Integration
 
