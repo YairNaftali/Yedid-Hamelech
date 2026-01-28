@@ -9,30 +9,24 @@ const Application: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    try {
-      const form = e.target as HTMLFormElement;
-      const formDataToSend = new FormData(form);
-      formDataToSend.append("access_key", "3023281a-abf3-4b3d-a9f9-06639b467c07");
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
 
-      console.log("Submitting form...");
-      
+    try {
       const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
-        body: formDataToSend
+        body: formData
       });
 
-      const result = await response.json();
-      console.log("Web3Forms response:", result);
+      const data = await response.json();
 
-      if (result.success) {
+      if (data.success) {
         setSubmitSuccess(true);
         form.reset();
       } else {
-        console.error("Submission failed:", result);
-        alert(`Error: ${result.message || 'There was an error submitting your application. Please try again or contact us directly.'}`);
+        alert('Error: ' + (data.message || 'Failed to submit application'));
       }
     } catch (error) {
-      console.error("Submission error:", error);
       alert('There was an error submitting your application. Please try again or contact us directly.');
     } finally {
       setIsSubmitting(false);
@@ -64,6 +58,7 @@ const Application: React.FC = () => {
           ) : (
           <form onSubmit={handleSubmit} className="space-y-12">
             {/* Web3Forms configuration */}
+            <input type="hidden" name="access_key" value="3023281a-abf3-4b3d-a9f9-06639b467c07" />
             <input type="hidden" name="subject" value="New Yeshiva Application Submission" />
             <input type="hidden" name="from_name" value="Yeshivas Yedid Hamelech Website" />
             <input type="checkbox" name="botcheck" style={{ display: 'none' }} />
