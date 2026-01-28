@@ -12,7 +12,16 @@ const Application: React.FC = () => {
         </div>
 
         <div className="bg-white shadow-2xl rounded p-8 md:p-16 border-t-8 border-[#1a5f7a]">
-          <form action="https://formspree.io/f/xqeqoebv" method="POST" className="space-y-12">
+          <form 
+            action="https://formspree.io/f/xqeqoebv" 
+            method="POST" 
+            className="space-y-12"
+            onSubmit={(e) => {
+              console.log('Form submit event fired!');
+              console.log('Form action:', e.currentTarget.action);
+              console.log('Form method:', e.currentTarget.method);
+            }}
+          >
             
             {/* Personal Information */}
             <div>
@@ -67,6 +76,10 @@ const Application: React.FC = () => {
               <button 
                 type="submit"
                 className="w-full bg-[#7D1D3F] text-white py-6 text-xs font-bold uppercase tracking-[0.4em] rounded shadow-2xl hover:bg-[#C9963F] hover:text-[#2C3E50] transition-all transform hover:-translate-y-1"
+                onClick={(e) => {
+                  console.log('Button clicked!');
+                  console.log('Button type:', e.currentTarget.type);
+                }}
               >
                 Submit Formal Application
               </button>
