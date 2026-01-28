@@ -14,20 +14,25 @@ const Application: React.FC = () => {
       const formDataToSend = new FormData(form);
       formDataToSend.append("access_key", "3023281a-abf3-4b3d-a9f9-06639b467c07");
 
+      console.log("Submitting form...");
+      
       const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
         body: formDataToSend
       });
 
       const result = await response.json();
+      console.log("Web3Forms response:", result);
 
       if (result.success) {
         setSubmitSuccess(true);
         form.reset();
       } else {
-        alert('There was an error submitting your application. Please try again or contact us directly.');
+        console.error("Submission failed:", result);
+        alert(`Error: ${result.message || 'There was an error submitting your application. Please try again or contact us directly.'}`);
       }
     } catch (error) {
+      console.error("Submission error:", error);
       alert('There was an error submitting your application. Please try again or contact us directly.');
     } finally {
       setIsSubmitting(false);
