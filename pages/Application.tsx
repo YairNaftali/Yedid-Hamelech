@@ -2,23 +2,6 @@
 import React, { useState } from 'react';
 
 const Application: React.FC = () => {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    dob: '',
-    address: '',
-    city: '',
-    state: '',
-    zip: '',
-    highSchool: '',
-    currentYeshiva: '',
-    rabbiReference: '',
-    rabbiPhone: '',
-    essay: '',
-  });
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
@@ -40,22 +23,7 @@ const Application: React.FC = () => {
 
       if (result.success) {
         setSubmitSuccess(true);
-        setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          dob: '',
-          address: '',
-          city: '',
-          state: '',
-          zip: '',
-          highSchool: '',
-          currentYeshiva: '',
-          rabbiReference: '',
-          rabbiPhone: '',
-          essay: '',
-        });
+        form.reset();
       } else {
         alert('There was an error submitting your application. Please try again or contact us directly.');
       }
@@ -64,10 +32,6 @@ const Application: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   return (
@@ -101,19 +65,19 @@ const Application: React.FC = () => {
               <div className="grid md:grid-cols-2 gap-8">
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">First Name</label>
-                  <input required name="firstName" value={formData.firstName} onChange={handleChange} className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="text" />
+                  <input required name="firstName" className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="text" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Last Name</label>
-                  <input required name="lastName" value={formData.lastName} onChange={handleChange} className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="text" />
+                  <input required name="lastName" className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="text" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Email Address</label>
-                  <input required name="email" value={formData.email} onChange={handleChange} className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="email" />
+                  <input required name="email" className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="email" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Primary Phone</label>
-                  <input required name="phone" value={formData.phone} onChange={handleChange} className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="tel" />
+                  <input required name="phone" className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="tel" />
                 </div>
               </div>
             </div>
@@ -124,11 +88,11 @@ const Application: React.FC = () => {
               <div className="grid md:grid-cols-2 gap-8">
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Current Yeshiva</label>
-                  <input required name="currentYeshiva" value={formData.currentYeshiva} onChange={handleChange} className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="text" />
+                  <input required name="currentYeshiva" className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="text" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Reference Rabbi</label>
-                  <input required name="rabbiReference" value={formData.rabbiReference} onChange={handleChange} className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="text" />
+                  <input required name="rabbiReference" className="w-full bg-[#F8F5F0] border-0 border-b-2 border-gray-200 focus:border-[#C9963F] outline-none py-3 px-4 text-gray-800 transition-colors" type="text" />
                 </div>
               </div>
             </div>
@@ -138,8 +102,6 @@ const Application: React.FC = () => {
               <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">What are your goals for this coming year?</label>
               <textarea 
                 name="essay" 
-                value={formData.essay}
-                onChange={handleChange} 
                 rows={6} 
                 className="w-full bg-[#fcfaf5] border-2 border-gray-100 rounded-lg p-6 focus:border-[#d4af37] outline-none text-gray-800 transition-all"
                 placeholder="Tell us about your aspirations and why you believe Yedid Hamelech is the right fit..."
