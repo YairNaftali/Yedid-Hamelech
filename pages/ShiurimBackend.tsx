@@ -203,8 +203,14 @@ const ShiurimBackend: React.FC = () => {
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!uploadData.duration) {
-      alert('Please wait for the audio file to load...');
+    if (!uploadData.duration || uploadData.duration === '') {
+      alert('Please wait for the audio file to load or enter duration manually...');
+      return;
+    }
+
+    // Validate duration format (basic check)
+    if (!uploadData.duration.includes(':')) {
+      alert('Duration must be in format MM:SS (e.g., 45:30)');
       return;
     }
 
