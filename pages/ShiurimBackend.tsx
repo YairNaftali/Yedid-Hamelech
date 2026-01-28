@@ -292,9 +292,7 @@ const ShiurimBackend: React.FC = () => {
       setUploadProgress('');
       await loadData();
       setShowUploadModal(false);
-      setIsAuthenticated(false);
-      setIsAdmin(false);
-      setPassword('');
+      // Keep authentication active - don't clear password/admin state
       setUploadData({ title: '', speaker: '', category: '', folder: '', file: null, duration: '' });
       alert('Shiur uploaded successfully!');
     } catch (error: any) {
