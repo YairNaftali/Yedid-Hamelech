@@ -1,45 +1,7 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 
 const Application: React.FC = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    const form = e.target as HTMLFormElement;
-    const formData = new FormData(form);
-
-    try {
-      console.log('Submitting to Formspree...');
-      const response = await fetch("https://formspree.io/f/xqeqoebv", {
-        method: "POST",
-        body: formData,
-        headers: {
-          'Accept': 'application/json'
-        }
-      });
-
-      console.log('Response status:', response.status);
-      const data = await response.json();
-      console.log('Response data:', data);
-
-      if (response.ok) {
-        setSubmitSuccess(true);
-        form.reset();
-      } else {
-        alert('Error: ' + (data.error || data.errors?.[0]?.message || 'Failed to submit application'));
-      }
-    } catch (error) {
-      console.error('Submission error:', error);
-      alert('There was an error submitting your application. Please try again or contact us directly.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <div className="pt-32 pb-24 bg-[#F8F5F0]">
       <div className="max-w-5xl mx-auto px-4">
@@ -50,21 +12,7 @@ const Application: React.FC = () => {
         </div>
 
         <div className="bg-white shadow-2xl rounded p-8 md:p-16 border-t-8 border-[#1a5f7a]">
-          {submitSuccess ? (
-            <div className="text-center py-16">
-              <div className="text-6xl mb-6">✓</div>
-              <h2 className="text-3xl serif font-semibold text-[#0F1729] mb-4">Application Submitted!</h2>
-              <p className="text-gray-600 mb-8">Thank you for applying to Yeshivas Yedid Hamelech. Our hanhala will review your application and be in touch soon.</p>
-              <button 
-                onClick={() => setSubmitSuccess(false)}
-                className="bg-[#1a5f7a] text-white px-8 py-3 text-xs font-bold uppercase tracking-[0.3em] rounded hover:bg-[#C9963F] transition-all"
-              >
-                Submit Another Application
-              </button>
-            </div>
-          ) : (
-          <form onSubmit={handleSubmit} className="space-y-12">
-            {/* Form fields - removed Web3Forms config */}
+          <form action="https://formspree.io/f/xqeqoebv" method="POST" className="space-y-12">
             
             {/* Personal Information */}
             <div>
@@ -117,16 +65,14 @@ const Application: React.FC = () => {
 
             <div className="pt-6">
               <button 
-                type="submit" 
-                disabled={isSubmitting}
-                className="w-full bg-[#7D1D3F] text-white py-6 text-xs font-bold uppercase tracking-[0.4em] rounded shadow-2xl hover:bg-[#C9963F] hover:text-[#2C3E50] transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                type="submit"
+                className="w-full bg-[#7D1D3F] text-white py-6 text-xs font-bold uppercase tracking-[0.4em] rounded shadow-2xl hover:bg-[#C9963F] hover:text-[#2C3E50] transition-all transform hover:-translate-y-1"
               >
-                {isSubmitting ? 'Submitting...' : 'Submit Formal Application'}
+                Submit Formal Application
               </button>
               <p className="mt-6 text-center text-xs text-gray-400 italic">By clicking submit, you acknowledge that all information provided is accurate and true.</p>
             </div>
           </form>
-          )}
         </div>
       </div>
     </div>
